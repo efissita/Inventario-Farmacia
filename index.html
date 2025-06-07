@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Medicamentos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Navegación */
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        /* Módulos principales */
+        .modulo {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .modulo h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        /* Buscador */
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-container input[type="text"] {
+            padding: 10px;
+            width: 70%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .search-container button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .search-container button:hover {
+            background-color: #45a049;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        /* Botones generales */
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Formulario de agregar/eliminar */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-actions button {
+            margin-top: 10px;
+            background-color: #28a745;
+        }
+
+        .form-actions button.delete-btn {
+            background-color: #dc3545;
+        }
+
+        .form-actions button:hover {
+            opacity: 0.9;
+        }
+
+        /* Sección de comparación */
+        #comparacion {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none; /* Oculto por defecto */
+        }
+
+        #comparacion h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .medicamento-comparado {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .medicamento-comparado div {
+            flex: 1 1 200px; /* Base flexible para los elementos */
+            padding: 0 10px;
+            margin-bottom: 10px; /* Espacio entre elementos en pantallas pequeñas */
+        }
+
+        .medicamento-comparado div strong {
+            color: #555;
+        }
+
+        /* Subpáginas */
+        .subpage {
+            display: none; /* Todas las subpáginas ocultas por defecto */
+        }
+
+        .subpage.active {
+            display: block; /* La subpágina activa se muestra */
+        }
+
+        /* Estilos para el módulo de ventas */
+        #ventas-page .item-venta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #ventas-page .item-venta:last-child {
+            border-bottom: none;
+        }
+
+        #ventas-page .item-venta span {
+            flex: 1;
+        }
+
+        #ventas-page .item-venta input[type="number"] {
+            width: 60px;
+            margin-right: 10px;
+        }
+
+        #ventas-page .item-venta button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0;
+            display: inline-block; /* Para que el botón de venta sea más pequeño */
+        }
+
+        #ventas-page .item-venta button:hover {
+            background-color: #0056b3;
+        }
+
+        #ventas-page .total-ventas {
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Estilos para el recibo */
+        #recibo-modal {
+            display: none; /* Oculto por defecto */
+            position: fixed; /* Posición fija en la pantalla */
+            z-index: 1000; /* Por encima de todo */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Habilitar scroll si es necesario */
+            background-color: rgba(0,0,0,0.4); /* Fondo semi-transparente */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .recibo-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%; /* Ancho del recibo */
+            max-width: 500px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .recibo-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 10px;
+        }
+
+        .recibo-header h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .recibo-body ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recibo-body ul li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px dotted #eee;
+            padding-bottom: 5px;
+        }
+
+        .recibo-body ul li:last-child {
+            border-bottom: none;
+        }
+
+        .recibo-total {
+            text-align: right;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px dashed #ccc;
+        }
+
+        .recibo-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .recibo-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .recibo-actions button {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .recibo-actions button:hover {
+            background-color: #0056b3;
+        }
+        .recibo-actions button.print-btn {
+            background-color: #28a745;
+        }
+        .recibo-actions button.print-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventario de Medicamentos</h1>
+
+    <div class="navbar">
+        <a href="#" id="nav-inventario">Inventario Principal</a>
+        <a href="#" id="nav-agregar">Agregar Medicamento</a>
+        <a href="#" id="nav-ventas">Registrar Venta</a>
+    </div>
+
+    <div id="inventario-page" class="subpage active">
+        <div class="modulo">
+            <h2>Lista de Medicamentos</h2>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Buscar medicamento por nombre o principio activo...">
+                <button onclick="buscarMedicamento()">Buscar</button>
+            </div>
+
+            <table id="tabla-medicamentos">
+                <thead>
+                    <tr>
+                        <th>Seleccionar</th>
+                        <th>Nombre del Medicamento</th>
+                        <th>Descripción</th>
+                        <th>Principio Activo</th>
+                        <th>Precio</th>
+                        <th>Existencia</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+
+            <button id="btn-comparar">Comparar seleccionados</button>
+
+            <div id="comparacion">
+                <h2>Comparación de Medicamentos Seleccionados</h2>
+                <div id="lista-comparacion">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="agregar-page" class="subpage">
+        <div class="modulo">
+            <h2>Agregar Nuevo Medicamento</h2>
+            <div class="form-group">
+                <label for="nombre-medicamento">Nombre del Medicamento:</label>
+                <input type="text" id="nombre-medicamento" required>
+            </div>
+            <div class="form-group">
+                <label for="descripcion-medicamento">Descripción:</label>
+                <textarea id="descripcion-medicamento"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="principio-activo">Principio Activo:</label>
+                <input type="text" id="principio-activo" required>
+            </div>
+            <div class="form-group">
+                <label for="precio-medicamento">Precio:</label>
+                <input type="number" id="precio-medicamento" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="existencia-medicamento">Existencia:</label>
+                <input type="number" id="existencia-medicamento" min="0" required>
+            </div>
+            <div class="form-actions">
+                <button onclick="agregarMedicamento()">Agregar Medicamento</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ventas-page" class="subpage">
+        <div class="modulo">
+            <h2>Registrar Venta</h2>
+            <div id="lista-productos-venta">
+                </div>
+            <div class="total-ventas">
+                Total de la Venta: $<span id="total-venta">0.00</span>
+            </div>
+            <button onclick="finalizarVenta()">Finalizar Venta</button>
+        </div>
+    </div>
+
+    <div id="recibo-modal">
+        <div class="recibo-content">
+            <div class="recibo-header">
+                <h3>Recibo de Venta</h3>
+                <p>Fecha: <span id="recibo-fecha"></span></p>
+                <p>Hora: <span id="recibo-hora"></span></p>
+            </div>
+            <div class="recibo-body">
+                <h4>Detalle de Productos:</h4>
+                <ul id="recibo-lista-productos">
+                    </ul>
+            </div>
+            <div class="recibo-total">
+                Total: $<span id="recibo-total-monto">0.00</span>
+            </div>
+            <div class="recibo-footer">
+                <p>¡Gracias por tu compra!</p>
+            </div>
+            <div class="recibo-actions">
+                <button onclick="imprimirRecibo()" class="print-btn">Imprimir</button>
+                <button onclick="cerrarRecibo()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="farmacia.js"></script>
+</body>
+</html>
